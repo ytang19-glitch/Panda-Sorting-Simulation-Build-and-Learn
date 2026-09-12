@@ -284,6 +284,64 @@ An empty workspace is not proof that the robot application has been built.
 
 As packages are developed, declare their dependencies in `package.xml` and update the container environment accordingly.
 
+### 5.11 Launch the Panda pick-and-place simulation
+
+Build from the workspace root, **not** from `/panda_ws/src`:
+
+```bash
+cd /panda_ws
+source /opt/ros/jazzy/setup.bash
+
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+colcon build --symlink-install
+source /panda_ws/install/setup.bash
+```
+
+Verify that ROS 2 can find the package:
+
+```bash
+ros2 pkg list | grep panda_bringup
+```
+
+Then launch the application:
+
+```bash
+ros2 launch panda_bringup pick_and_place.launch.xml
+```
+
+If ROS reports `Package 'panda_bringup' not found`, check that the source
+package is complete:
+
+```bash
+ls /panda_ws/src/panda_bringup
+```
+
+It should contain `package.xml`, `CMakeLists.txt`, and a `launch/`
+directory. Then rebuild and source the workspace again:
+
+```bash
+cd /panda_ws
+source /opt/ros/jazzy/setup.bash
+colcon build --symlink-install
+source /panda_ws/install/setup.bash
+```
+
+Every new Docker shell must source both ROS 2 and the built workspace:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+source /panda_ws/install/setup.bash
+```
+
+Optionally, configure this automatically for future shells:
+
+```bash
+echo 'source /opt/ros/jazzy/setup.bash' >> ~/.bashrc
+echo 'source /panda_ws/install/setup.bash' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ## 6. Graphical Applications in Docker
 
 Before Stage 02, configure graphical access for the actual laptop environment.
